@@ -1,79 +1,29 @@
 #!/usr/bin/python3
-"""
-Define island_perimeter function that finds the perimeter
-of an island in a body of water
+"""Prime game module.
 """
 
-bound_4 = set()
-bound_3 = set()
-bound_2 = set()
-bound_1 = set()
 
-
-def boundary(grid, i, j):
-    """Find cells with either 4, 3, 2 or 1 exposed boundary and add them to
-       appropriate set
-       Args:
-           grid (list): 2d list
-           i (int): row number
-           j (int): column number
+def isWinner(x, nums):
+    """Determines the winner of a prime game session with `x` rounds.
     """
-    boundaries = 0
-    try:
-        if i == 0:
-            boundaries += 1
-        elif grid[i-1][j] == 0:
-            boundaries += 1
-    except:
-        boundaries += 1
-    try:
-        if grid[i+1][j] == 0:
-            boundaries += 1
-    except:
-        boundaries += 1
-    try:
-        if grid[i][j+1] == 0:
-            boundaries += 1
-    except:
-        boundaries += 1
-    try:
-        if j == 0:
-            boundaries += 1
-        elif grid[i][j-1] == 0:
-            boundaries += 1
-    except:
-        boundaries += 1
+    if x < 1 or not nums:
+        return None
+    marias_wins, bens_wins = 0, 0
+    # generate primes with a limit of the maximum number in nums
+    n = max(nums)
+    primes = [True for _ in range(1, n + 1, 1)]
+    primes[0] = False
+    for i, is_prime in enumerate(primes, 1):
+        if i == 1 or not is_prime:
+            continue
+        for j in range(i + i, n + 1, i):
+            primes[j - 1] = False
+    # filter the number of primes less than n in nums for each round
+    for _, n in zip(range(x), nums):
+        primes_count = len(list(filter(lambda x: x, primes[0: n])))
+        bens_wins += primes_count % 2 == 0
+        marias_wins += primes_count % 2 == 1
+    if marias_wins == bens_wins:
+        return None
+    return 'Maria' if marias_wins > bens_wins else 'Ben'
 
-    if boundaries == 1:
-        bound_1.add((i, j))
-    elif boundaries == 2:
-        bound_2.add((i, j))
-    elif boundaries == 3:
-        bound_3.add((i, j))
-    elif boundaries == 4:
-        bound_4.add((i, j))
-
-
-def island_perimeter(grid):
-    """
-    Calculate and return perimeter of island in the grid
-    Grid is a rectangular grid where 0s represent water and 1s represent land
-    Each cell is a square with a side length of 1
-    There is only one island
-    Args:
-        grid [list] : 2d list of ints either 0 or 1
-    Return:
-       perimeter of island
-    """
-    if grid == []:
-        return 0
-    l = len(grid)
-    w = len(grid[0])
-    for i in range(l):
-        for j in range(w):
-            if grid[i][j] == 1:
-                boundary(grid, i, j)
-                if len(bound_4) != 0:
-                    return 4
-    perimeter = (len(bound_3) * 3) + (len(bound_2) * 2) + (len(bound_1))
-    return perimeter
